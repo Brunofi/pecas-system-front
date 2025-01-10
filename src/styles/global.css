@@ -1,0 +1,23 @@
+/* Estilização da navbar */
+.custom-navbar {
+    background-color: #b1abab; /* Cinza escuro */
+    color: #000000; /* Cor do texto preto */
+  }
+  
+  /* Links principais na navbar */
+  .custom-navbar .navbar-item {
+    color: #000000 !important; /* Texto preto para itens de menu */
+  }
+  
+  /* Links no dropdown */
+  .custom-navbar .navbar-dropdown .navbar-item {
+    color: #000000 !important; /* Texto preto para subitens */
+  }
+  
+  /* Hover nos links */
+  .custom-navbar .navbar-item:hover, 
+  .custom-navbar .navbar-dropdown .navbar-item:hover {
+    background-color: #e0e0e0; /* Cinza claro para hover */
+    color: #000000 !important; /* Mantém o texto preto no hover */
+  }
+  

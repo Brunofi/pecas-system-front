@@ -1,0 +1,1 @@
+export {usePecaService} from './peca.service'
