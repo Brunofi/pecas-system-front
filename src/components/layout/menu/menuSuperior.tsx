@@ -38,14 +38,14 @@ export const MenuSuperior: React.FC = () => {
                             <Link href="/cadastros/locacao" className="navbar-item">Locação</Link>
                             <Link href="/cadastros/estoque" className="navbar-item">Estoque</Link>
                             <Link href="/cadastros/usuario" className="navbar-item">Usuario</Link>
-                            <Link href="/cadastros/colaborador" className="navbar-item">Colaborador</Link>
+                           
                         </div>
                     </div>
 
                     <div className="navbar-item has-dropdown is-hoverable">
                         <a className="navbar-link">Alterações</a>
                         <div className="navbar-dropdown">
-                            <Link href="alteracoes/qtdestoque" className="navbar-item">Quantidade Estoque</Link>
+                            <Link href="/alteracoes/estoque" className="navbar-item">Quantidade Estoque</Link>
                         </div>
                     </div>
 

@@ -1,6 +1,6 @@
 export interface Peca {
     id?: number;
-    partnumber?: string;  // Certifique-se que o nome está correto
+    partnumber?: string;
     nome?: string;
     fabricante?: string;
     subsistema?: string;

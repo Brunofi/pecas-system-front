@@ -1,0 +1,1 @@
+export {AlteracaoEstoque} from './formAlteracaoEstoque'

@@ -1,2 +1,5 @@
 export {Layout} from './layout'
 export {CadastroPeca} from './cadastros'
+export {CadastroEstoque} from './cadastros'
+export {CadastroLocacao} from './cadastros'
+export {AlteracaoEstoque} from './alteracoes'

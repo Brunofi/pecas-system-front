@@ -1,13 +1,14 @@
 import { httpClient } from 'app/http';
-import { Peca } from 'app/models/pecas';
+import { Locacao } from 'app/models/locacao'; 
 import { AxiosResponse } from 'axios';
 
-const resourceUrl: string = "/pecas";
+const resourceUrl: string = "/locacoes";
 
-export const usePecaService = () => {
-    const salvar = async (peca: Peca): Promise<string> => {
+export const useLocacaoService = () => {
+
+    const salvar = async (locacao: Locacao): Promise<string> => {
         try {
-            const response: AxiosResponse<{ mensagem: string }> = await httpClient.post(`${resourceUrl}/cadastrar`, peca);
+            const response: AxiosResponse<{ mensagem: string }> = await httpClient.post(`${resourceUrl}/cadastrar`, locacao);
             return response.data.mensagem; // Retorna a mensagem de sucesso
         } catch (error: any) {
             if (error.response) {
@@ -17,11 +18,10 @@ export const usePecaService = () => {
             throw error;
         }
     };
-    
 
-    const alterar = async (peca: Peca): Promise<string> => {
+    const alterar = async (locacao: Locacao): Promise<string> => {
         try {
-            const response: AxiosResponse<{ mensagem: string }> = await httpClient.put(`${resourceUrl}/alterar`, peca);
+            const response: AxiosResponse<{ mensagem: string }> = await httpClient.put(`${resourceUrl}/alterar`, locacao);
             return response.data.mensagem; // Retorna a mensagem de sucesso
         } catch (error: any) {
             if (error.response) {
@@ -31,25 +31,11 @@ export const usePecaService = () => {
             throw error;
         }
     };
-    
 
-    const buscarPecasPorPartNumber = async (partnumber?: string): Promise<Peca[]> => {
-        const url = `${resourceUrl}/listar?partnumber=${encodeURIComponent(partnumber || "")}`;
-        const response: AxiosResponse<Peca[]> = await httpClient.get<Peca[]>(url);
-        return response.data;
-      };
-      
-      const buscarPecasPorNome = async (nome?: string): Promise<Peca[]> => {
-        const url = `${resourceUrl}/listar?nome=${encodeURIComponent(nome || "")}`;
-        const response: AxiosResponse<Peca[]> = await httpClient.get<Peca[]>(url);
-        return response.data;
-      };
-      
-
-      const buscarPecaPorId = async (id: number): Promise<Peca> => {
-        const url = `${resourceUrl}/buscar/${id}`;
+    const buscarLocacoes = async (locacao?: string): Promise<Locacao[]> => {
+        const url = `${resourceUrl}/listar?locacao=${encodeURIComponent(locacao || "")}`;
         try {
-            const response: AxiosResponse<Peca> = await httpClient.get<Peca>(url);
+            const response: AxiosResponse<Locacao[]> = await httpClient.get<Locacao[]>(url);
             return response.data;
         } catch (error: any) {
             if (error.response) {
@@ -59,9 +45,22 @@ export const usePecaService = () => {
             throw error;
         }
     };
-    
 
-      const remover = async (id: number): Promise<string> => {
+    const buscarLocacaoPorId = async (id: number): Promise<Locacao> => {
+        const url = `${resourceUrl}/buscar/${id}`;
+        try {
+            const response: AxiosResponse<Locacao> = await httpClient.get<Locacao>(url);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                // Lança a mensagem de erro do back-end
+                throw new Error(error.response.data.mensagem);
+            }
+            throw error;
+        }
+    };
+
+    const remover = async (id: number): Promise<string> => {
         const url = `${resourceUrl}/remover/${id}`;
         try {
             const response: AxiosResponse<{ mensagem: string }> = await httpClient.delete(url);
@@ -77,10 +76,9 @@ export const usePecaService = () => {
 
     return {
         salvar,
-        buscarPecasPorPartNumber,
-        buscarPecasPorNome,
-        buscarPecaPorId,
         alterar,
+        buscarLocacoes,
+        buscarLocacaoPorId,
         remover
     };
 };

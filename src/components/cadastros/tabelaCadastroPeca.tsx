@@ -8,7 +8,7 @@ import { Peca } from "app/models/pecas";
 type TabelaCadastroPecaProps = {
   onAlterarClick: (id: number) => void;
   limparCampos: () => void;
-  
+
 };
 
 
@@ -76,20 +76,24 @@ export const TabelaCadastroPeca: React.FC<TabelaCadastroPecaProps> = ({ onAltera
             Nome
           </label>
         </div>
-
+        <div className="field has-addons" style={{ maxWidth: "50%", }}>
+        <div className="control is-expanded">     
         <input
           type="text"
+          className="input"
           placeholder="Pesquisar"
           value={pesquisa}
           onChange={(e) => setPesquisa(e.target.value)}
-          style={{ padding: "8px", marginRight: "10px" }}
+          
         />
+        </div>
         <button
           onClick={handlePesquisa}
-          style={{ padding: "8px 12px", backgroundColor: "#4CAF50", color: "white" }}
+          className="button is-primary"
         >
           Pesquisar
         </button>
+        </div>
 
       </div>
       <table className="table is-striped is-fullwidth">
@@ -114,10 +118,11 @@ export const TabelaCadastroPeca: React.FC<TabelaCadastroPecaProps> = ({ onAltera
                   <button
                     onClick={() => {
                       onAlterarClick(peca.id ?? 0);
-                      limparTabela();}}
+                      limparTabela();
+                    }}
                     style={{ backgroundColor: "#2196F3", color: "white", padding: "5px 10px", border: "none", cursor: "pointer" }}
                   >
-                    Inspecionar
+                    Selecionar
                   </button>
                 </td>
               </tr>
