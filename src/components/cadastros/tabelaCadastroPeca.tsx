@@ -77,22 +77,22 @@ export const TabelaCadastroPeca: React.FC<TabelaCadastroPecaProps> = ({ onAltera
           </label>
         </div>
         <div className="field has-addons" style={{ maxWidth: "50%", }}>
-        <div className="control is-expanded">     
-        <input
-          type="text"
-          className="input"
-          placeholder="Pesquisar"
-          value={pesquisa}
-          onChange={(e) => setPesquisa(e.target.value)}
-          
-        />
-        </div>
-        <button
-          onClick={handlePesquisa}
-          className="button is-primary"
-        >
-          Pesquisar
-        </button>
+          <div className="control is-expanded">
+            <input
+              type="text"
+              className="input"
+              placeholder="Pesquisar"
+              value={pesquisa}
+              onChange={(e) => setPesquisa(e.target.value)}
+
+            />
+          </div>
+          <button
+            onClick={handlePesquisa}
+            className="button is-primary"
+          >
+            Pesquisar
+          </button>
         </div>
 
       </div>

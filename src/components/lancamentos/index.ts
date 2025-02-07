@@ -1,0 +1,1 @@
+export {SaidaPeca} from './formLancamentoSaidaPeca';

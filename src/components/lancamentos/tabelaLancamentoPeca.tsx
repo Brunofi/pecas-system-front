@@ -4,13 +4,13 @@ import 'bulma/css/bulma.css';
 import { Estoque } from "app/models/estoque";
 import { useEstoqueService } from "app/services";
 
-type TabelaAlteracaoEstoqueProps = {
+type TabelaLancamentoPecaEstoqueProps = {
     onAlterarClick: (id: number) => void;
     limparCampos: () => void;
 
 };
 
-export const TabelaAlteracaoEstoque: React.FC <TabelaAlteracaoEstoqueProps>= ({onAlterarClick,limparCampos}) => {
+export const TabelaLancamentoPeca: React.FC <TabelaLancamentoPecaEstoqueProps>= ({onAlterarClick,limparCampos}) => {
     const [pesquisa, setPesquisa] = useState("");
     const [resultados, setResultados] = useState<Estoque[]>([]);
     const service = useEstoqueService();
@@ -102,8 +102,12 @@ export const TabelaAlteracaoEstoque: React.FC <TabelaAlteracaoEstoqueProps>= ({o
                         <th>ID</th>
                         <th>Part number</th>
                         <th>Nome</th>
-                        <th>Estado</th>
                         <th>Quantidade</th>
+                        <th>Estado</th>
+                        <th>Locação</th>
+                        <th>Sub-Locação</th>
+                        <th>IdPeca</th>
+                        <th>IdLocacão</th>
                         <th>Ações</th>
 
                     </tr>
@@ -115,8 +119,13 @@ export const TabelaAlteracaoEstoque: React.FC <TabelaAlteracaoEstoqueProps>= ({o
                                 <td>{estoque.id}</td>
                                 <td>{estoque.peca?.partnumber}</td>
                                 <td>{estoque.peca?.nome}</td>
-                                <td>{estoque.peca?.estado}</td>
                                 <td>{estoque.quantidade}</td>
+                                <td>{estoque.peca?.estado}</td>
+                                <td>{estoque.locacao?.locacao}</td>
+                                <td>{estoque.locacao?.sub}</td>
+                                <td>{estoque.peca?.id}</td>
+                                <td>{estoque.locacao?.id}</td>
+                                
 
                                 <td>
                                     <button

@@ -40,6 +40,20 @@ export const useEstoqueService = () => {
         }
     };
 
+    const buscarEstoquesPorNome = async (nome: string): Promise<Estoque[]> => {
+        const url = `${resourceUrl}/nome/${encodeURIComponent(nome)}`;
+        try {
+            const response: AxiosResponse<Estoque[]> = await httpClient.get<Estoque[]>(url);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                // Lança a mensagem de erro do back-end
+                throw new Error(error.response.data.mensagem || "Erro ao buscar estoques");
+            }
+            throw error;
+        }
+    };
+
     const buscarEstoquePorId = async (id: number): Promise<Estoque> => {
         const url = `${resourceUrl}/${id}`;
         try {
@@ -81,7 +95,8 @@ export const useEstoqueService = () => {
         cadastrarComIds,
         buscarEstoquesPorPartNumber,
         buscarEstoquePorId,
-        alterarQuantidade
+        alterarQuantidade,
+        buscarEstoquesPorNome
     };
 
 

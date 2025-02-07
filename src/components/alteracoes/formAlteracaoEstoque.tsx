@@ -70,7 +70,7 @@ export const AlteracaoEstoque: React.FC = () => {
 
 
     return (
-        <Layout titulo="Cadastro de locação">
+        <Layout titulo="Alteração quantidade em estoque">
             <TabelaAlteracaoEstoque
                 onAlterarClick={buscarEstoquePorId}
                 limparCampos={limparFormulario}
