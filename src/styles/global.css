@@ -20,4 +20,16 @@
     background-color: #e0e0e0; /* Cinza claro para hover */
     color: #000000 !important; /* Mantém o texto preto no hover */
   }
+
+  /* Estilo personalizado para o botão de logout */
+.navbar-end .button.is-danger {
+  background-color: #ff3860; /* Cor de fundo */
+  color: rgb(17, 16, 16); /* Cor do texto */
+  border: none; /* Remove a borda */
+  transition: background-color 0.3s ease; /* Efeito de transição */
+}
+
+.navbar-end .button.is-danger:hover {
+  background-color: #ff1c4d; /* Cor de fundo ao passar o mouse */
+}
   

@@ -1,6 +1,10 @@
+import { useSaidaService } from './saida.service'
+
 export {usePecaService} from './peca.service'
 export {useLocacaoService} from './locacao.service'
 export {useEstoqueService} from './estoque.service'
 export {useChassisService} from './chassis.service'
-export {useEstapaService} from './estapa.service'
+export {useEtapaService} from './etapa.service'
 export {useSessaoService} from './sessao.service'
+export {useUsuarioService} from './usuario.service'
+export {useSaidaService} from './saida.service'

@@ -13,7 +13,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
     return (
         <div className="app">
-            {/* Adiciona o menu superior */}
+            
             <MenuSuperior />
 
             <section className="main-content columns is-centered">

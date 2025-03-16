@@ -1,5 +1,6 @@
+
 import 'bulma/css/bulma.css'
-import { Layout } from 'components';
+import { Login } from 'components';
 import '../styles/global.css'
 
 export default function Home() {
@@ -7,11 +8,9 @@ export default function Home() {
     
     return (
       <div>
-        <Layout />
+        <Login />
       </div>
     )
     
   ;
 }
-
-

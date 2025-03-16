@@ -1,11 +1,13 @@
 import 'bulma/css/bulma.css';
 import { CadastroLocacao } from 'components/cadastros';
+import { ProtectedRoute } from 'components/protecaoRota';
 
 
 const PecaPage: React.FC = () => {
     return (
-
-        <CadastroLocacao />
+        <ProtectedRoute perfisPermitidos={['gerente', 'analista']}>
+            <CadastroLocacao />
+        </ProtectedRoute>
     )
 };
 
