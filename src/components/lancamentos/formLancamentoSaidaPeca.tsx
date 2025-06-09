@@ -30,6 +30,7 @@ export const SaidaPeca: React.FC = () => {
     const [idEstoque, setIdEstoque] = useState('');
     const [idPeca, setIdPeca] = useState('');
     const [idLocacao, setIdLocacao] = useState('');
+    const [colaboradorLancamento, setColaboradorLancamento] = useState<string>("");
 
     const [chassisOptions, setChassisOptions] = useState<Chassis[]>([]);
     const [etapaOptions, setEtapaOptions] = useState<Etapa[]>([]);
@@ -50,6 +51,13 @@ export const SaidaPeca: React.FC = () => {
             setTipoMensagem('');
         }, 5000); // Remove a mensagem após 5 segundos
     };
+
+    useEffect(() => {
+        const nomeUsuario = localStorage.getItem('nome');
+        if (nomeUsuario) {
+            setColaboradorLancamento(nomeUsuario);
+        }
+    }, []);
 
     // Carregar chassis
     useEffect(() => {
@@ -150,6 +158,7 @@ export const SaidaPeca: React.FC = () => {
             tipoConsumo: tipo,
             colaboradorEntrega,
             colaboradorRetirada: colaboradorRetira,
+            colaboradorLancamento: colaboradorLancamento,
             motivoConsumo: motivo as 'AVARIA' | 'MANUTENCAO', // Garante que o motivo seja um dos valores permitidos
             etapa,
             sessao: sessaoSelecionada,
