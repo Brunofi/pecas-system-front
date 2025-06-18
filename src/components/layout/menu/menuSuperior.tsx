@@ -89,7 +89,7 @@ export const MenuSuperior: React.FC = () => {
                     <div className="navbar-item has-dropdown is-hoverable">
                         <a className="navbar-link">Orçamentos</a>
                         <div className="navbar-dropdown">
-                            <Link href="/orcamentos/solicitarpeca" className="navbar-item">Solicitar peças</Link>
+                            <Link href="/orcamentos/orcamentopeca" className="navbar-item">Solicitar peças</Link>
                             {verificarPermissao(perfil, ['gerente','analista','estoquista', ]) && (
                             <Link href="/orcamentos/visualizarorcamentos" className="navbar-item">Visualizar orçamentos</Link>
                             )}

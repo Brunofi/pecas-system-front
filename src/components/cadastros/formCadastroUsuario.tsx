@@ -34,7 +34,7 @@ export const CadastroUsuario: React.FC = () => {
         setNome(usuario.nome || "");
         setEmail(usuario.email || "");
         setLogin(usuario.login || "");
-        setSenha(""); // Não preenche a senha por segurança
+        setSenha(usuario.senha || ""); 
         setPerfil(usuario.perfil || "");
         setSetor(usuario.setor || "");
     };
@@ -194,7 +194,7 @@ export const CadastroUsuario: React.FC = () => {
                 <div className="column">
                     <div className="field">
                         <label className="label" htmlFor="inputSenha">
-                            {id ? "Nova Senha (deixe em branco para manter)" : "Senha *"}
+                            {id ? "Senha" : "Senha *"}
                         </label>
                         <div className="control">
                             <input 
