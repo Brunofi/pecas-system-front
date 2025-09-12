@@ -71,11 +71,63 @@ export const useOrcamentoService = () => {
         }
     };
 
+
+    const listarPorFiltros = async (filtros: {
+        chassis: string;
+        etapa: string;
+        sessao?: string;
+        motivo?: string;
+    }): Promise<Orcamento[]> => {
+        try {
+            // Remove campos vazios ou undefined
+            const params: any = {
+                chassis: filtros.chassis,
+                etapa: filtros.etapa
+            };
+
+            if (filtros.sessao) params.sessao = filtros.sessao;
+            if (filtros.motivo) params.motivo = filtros.motivo;
+
+            const response: AxiosResponse<Orcamento[]> = await httpClient.get(
+                `${resourceUrl}/filtrar`,
+                { params }
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.status === 204) { // NO_CONTENT
+                return [];
+            }
+            if (error.response?.data?.mensagem) {
+                throw new Error(error.response.data.mensagem);
+            }
+            throw error;
+        }
+    };
+
+    const cancelarSolicitacao = async (id: number): Promise<string> => {
+    try {
+        const response: AxiosResponse<{ mensagem: string }> = await httpClient.put(
+            `${resourceUrl}/cancelar/${id}`
+        );
+        return response.data.mensagem;
+    } catch (error: any) {
+        if (error.response?.data?.mensagem) {
+            throw new Error(error.response.data.mensagem);
+        }
+        throw error;
+    }
+};
+
+
+
     return {
         cadastrar,
         listar,
         buscarPorId,
         atualizar,
-        remover
+        remover,
+        listarPorFiltros,
+        cancelarSolicitacao
+
     };
 };

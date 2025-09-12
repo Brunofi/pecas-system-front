@@ -2,7 +2,7 @@ export interface Orcamento {
     id?: number;
     partnumber?: string;
     nomePeca?: string;
-    dataPedido?: string; // timestamp no banco
+    dataPedido?: string;
     quantidade: number;
     colaboradorEntrega?: string;
     colaboradorPedido: string;
@@ -13,5 +13,6 @@ export interface Orcamento {
     eixoLado?: string;
     numeroMotorCambio?: string;
     estadoPeca?: string;
-    statusPeca?: string;
+    statusPeca?: 'PENDENTE' | 'SEPARADA' | 'ENTREGUE' | 'LANCADA' | 
+                 'INDISPONIVEL' | 'CANCELADA' | 'SOLUCIONADO INTERNO' | 'VALE PECA';
 }

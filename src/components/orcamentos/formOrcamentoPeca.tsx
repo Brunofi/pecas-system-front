@@ -14,23 +14,38 @@ import { Sessao } from "app/models/sessao";
 import { Motor } from "app/models/motor";
 import { Cambio } from "app/models/cambio";
 import { Mensagem } from "components/mensagem";
+import { Orcamento } from "app/models/orcamento";
+import { TabelaSolicitacoes } from "components/orcamentos/TabelaSolicitacoes";
 
 export const OrcamentoForm: React.FC = () => {
-    // Estados para os filtros superiores
-    const [chassisSelecionado, setChassisSelecionado] = useState<string>("");
-    const [etapaSelecionada, setEtapaSelecionada] = useState<string>("");
-    const [sessaoSelecionada, setSessaoSelecionada] = useState<string>("");
-    const [motivo, setMotivo] = useState<string>("");
-    const [tipoComponente, setTipoComponente] = useState<"motor" | "cambio">("motor");
-    const [componenteSelecionado, setComponenteSelecionado] = useState<string>("");
-    
+    // Estados para os filtros
+    const [filtros, setFiltros] = useState({
+        chassis: "",
+        etapa: "",
+        sessao: "",
+        motivo: "",
+        tipoComponente: "motor" as "motor" | "cambio",
+        componente: ""
+    });
+
+    // Estado para controlar quais campos foram tocados/validados
+    const [camposTocados, setCamposTocados] = useState({
+        chassis: false,
+        etapa: false,
+        sessao: false,  // Adicionado
+        motivo: false   // Adicionado
+
+    });
+
     // Estados para as listas de opções
     const [chassisOptions, setChassisOptions] = useState<Chassis[]>([]);
     const [etapaOptions, setEtapaOptions] = useState<Etapa[]>([]);
     const [sessaoOptions, setSessaoOptions] = useState<Sessao[]>([]);
     const [motorOptions, setMotorOptions] = useState<Motor[]>([]);
     const [cambioOptions, setCambioOptions] = useState<Cambio[]>([]);
-    
+    const [ultimaSolicitacao, setUltimaSolicitacao] = useState<Orcamento | null>(null);
+    const [validacaoSolicitacao, setValidacaoSolicitacao] = useState(false);
+
     // Estados para mensagens
     const [mensagem, setMensagem] = useState('');
     const [tipoMensagem, setTipoMensagem] = useState<'is-success' | 'is-danger' | ''>('');
@@ -53,7 +68,7 @@ export const OrcamentoForm: React.FC = () => {
                     motorService.listarMotores(),
                     cambioService.listarCambios()
                 ]);
-                
+
                 setChassisOptions(chassis);
                 setEtapaOptions(etapas);
                 setSessaoOptions(sessoes);
@@ -63,7 +78,7 @@ export const OrcamentoForm: React.FC = () => {
                 mostrarMensagem("Erro ao carregar opções: " + error.message, 'is-danger');
             }
         };
-        
+
         carregarOpcoes();
     }, []);
 
@@ -76,34 +91,84 @@ export const OrcamentoForm: React.FC = () => {
         }, 5000);
     };
 
-    const handleCarregar = () => {
-        // Lógica para carregar os dados com os filtros aplicados
-        // Será implementada posteriormente com a tabela de orçamentos
-        mostrarMensagem("Funcionalidade será implementada na próxima etapa", 'is-success');
+    const handleFiltroChange = (campo: string, valor: string) => {
+    setFiltros(prev => ({ ...prev, [campo]: valor }));
+    
+    // Marca o campo como tocado para mostrar validação
+    if (campo in camposTocados) {
+        setCamposTocados(prev => ({ ...prev, [campo]: true }));
+    }
+};
+
+   const handleCarregar = () => {
+    // Marca apenas os campos obrigatórios como tocados
+    setCamposTocados({
+        chassis: true,
+        etapa: true,
+        sessao: false,  // Mantém false para busca
+        motivo: false   // Mantém false para busca
+    });
+    setValidacaoSolicitacao(false); // Importante: não é validação para solicitação
+
+    // Validação apenas dos campos obrigatórios
+    const camposFaltantes = [];
+    if (!filtros.chassis) camposFaltantes.push("Chassis");
+    if (!filtros.etapa) camposFaltantes.push("Etapa");
+
+    if (camposFaltantes.length > 0) {
+        mostrarMensagem(`Preencha os campos obrigatórios: ${camposFaltantes.join(', ')}`, 'is-danger');
+        return;
+    }
+
+    mostrarMensagem("Dados carregados com base nos filtros!", 'is-success');
+};
+
+    const handleSolicitarPeca = (orcamento: Orcamento) => {
+        console.log("Orçamento criado:", orcamento);
+        mostrarMensagem(`Peça ${orcamento.partnumber} solicitada com sucesso!`, 'is-success');
+        setUltimaSolicitacao(orcamento);
     };
 
-    const handleSolicitarPeca = (/*peca: Peca, lado: string, quantidade: number*/) => {
-        // Lógica para adicionar a peça ao orçamento
-        console.log("Peça solicitada:", { /*peca, lado, quantidade*/ });
-        mostrarMensagem(`Peça adicionada ao orçamento`, 'is-success');
-    };
+
+
+    // Função para verificar se um campo é inválido
+    const isCampoInvalido = (campo: string) => {
+    const foiTocado = camposTocados[campo as keyof typeof camposTocados];
+    const estaVazio = !filtros[campo as keyof typeof filtros];
     
+    // Campos sempre obrigatórios
+    if (campo === 'chassis' || campo === 'etapa') {
+        return foiTocado && estaVazio;
+    }
+    
+    // Campos opcionais para busca, obrigatórios para solicitação
+    if (validacaoSolicitacao && (campo === 'sessao' || campo === 'motivo')) {
+        return foiTocado && estaVazio;
+    }
+    
+    return false;
+};
+
+
 
     return (
         <Layout titulo="Solicitação de Orçamento">
             {/* Parte superior - Filtros */}
             <div className="box" style={{ marginBottom: "20px" }}>
-                <div className="columns">
-                    <div className="column">
+                <h3 className="title is-5" style={{ marginBottom: "20px" }}>Filtros de Busca</h3>
+                <div className="columns is-vcentered is-multiline">
+                    {/* Chassis */}
+                    <div className="column is-narrow">
                         <div className="field">
-                            <label className="label">Chassis</label>
+                            <label className="label is-small">Chassis *</label>
                             <div className="control">
-                                <div className="select is-fullwidth">
-                                    <select 
-                                        value={chassisSelecionado} 
-                                        onChange={e => setChassisSelecionado(e.target.value)}
+                                <div className={`select is-small ${isCampoInvalido('chassis') ? 'is-danger' : ''}`}>
+                                    <select
+                                        value={filtros.chassis}
+                                        onChange={e => handleFiltroChange('chassis', e.target.value)}
+                                        className={isCampoInvalido('chassis') ? 'is-danger' : ''}
                                     >
-                                        <option value="">Selecione um chassis</option>
+                                        <option value="">Selecione</option>
                                         {chassisOptions.map(chassi => (
                                             <option key={chassi.id} value={chassi.numeral}>
                                                 {chassi.numeral}
@@ -111,20 +176,25 @@ export const OrcamentoForm: React.FC = () => {
                                         ))}
                                     </select>
                                 </div>
+                                {isCampoInvalido('chassis') && (
+                                    <p className="help is-danger">Chassis é obrigatório</p>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    <div className="column">
+                    {/* Etapa */}
+                    <div className="column is-narrow">
                         <div className="field">
-                            <label className="label">Etapa</label>
+                            <label className="label is-small">Etapa *</label>
                             <div className="control">
-                                <div className="select is-fullwidth">
-                                    <select 
-                                        value={etapaSelecionada} 
-                                        onChange={e => setEtapaSelecionada(e.target.value)}
+                                <div className={`select is-small ${isCampoInvalido('etapa') ? 'is-danger' : ''}`}>
+                                    <select
+                                        value={filtros.etapa}
+                                        onChange={e => handleFiltroChange('etapa', e.target.value)}
+                                        className={isCampoInvalido('etapa') ? 'is-danger' : ''}
                                     >
-                                        <option value="">Selecione uma etapa</option>
+                                        <option value="">Selecione</option>
                                         {etapaOptions.map(etapa => (
                                             <option key={etapa.id} value={etapa.etapa}>
                                                 {etapa.etapa}
@@ -132,20 +202,24 @@ export const OrcamentoForm: React.FC = () => {
                                         ))}
                                     </select>
                                 </div>
+                                {isCampoInvalido('etapa') && (
+                                    <p className="help is-danger">Etapa é obrigatória</p>
+                                )}
                             </div>
                         </div>
                     </div>
-
-                    <div className="column">
+                    {/* Sessão */}
+                    <div className="column is-narrow">
                         <div className="field">
-                            <label className="label">Sessão</label>
+                            <label className="label is-small">Sessão {validacaoSolicitacao ? '*' : ''}</label>
                             <div className="control">
-                                <div className="select is-fullwidth">
-                                    <select 
-                                        value={sessaoSelecionada} 
-                                        onChange={e => setSessaoSelecionada(e.target.value)}
+                                <div className={`select is-small ${isCampoInvalido('sessao') ? 'is-danger' : ''}`}>
+                                    <select
+                                        value={filtros.sessao}
+                                        onChange={e => handleFiltroChange('sessao', e.target.value)}
+                                        className={isCampoInvalido('sessao') ? 'is-danger' : ''}
                                     >
-                                        <option value="">Selecione uma sessão</option>
+                                        <option value="">Selecione</option>
                                         {sessaoOptions.map(sessao => (
                                             <option key={sessao.id} value={sessao.sessao}>
                                                 {sessao.sessao}
@@ -153,68 +227,79 @@ export const OrcamentoForm: React.FC = () => {
                                         ))}
                                     </select>
                                 </div>
+                                {isCampoInvalido('sessao') && (
+                                    <p className="help is-danger">Sessão é obrigatória para solicitação</p>
+                                )}
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="columns">
-                    <div className="column">
+                    {/* Motivo */}
+                    <div className="column is-narrow">
                         <div className="field">
-                            <label className="label">Motivo</label>
+                            <label className="label is-small">Motivo {validacaoSolicitacao ? '*' : ''}</label>
                             <div className="control">
-                                <div className="select is-fullwidth">
-                                    <select 
-                                        value={motivo} 
-                                        onChange={e => setMotivo(e.target.value)}
+                                <div className={`select is-small ${isCampoInvalido('motivo') ? 'is-danger' : ''}`}>
+                                    <select
+                                        value={filtros.motivo}
+                                        onChange={e => handleFiltroChange('motivo', e.target.value)}
+                                        className={isCampoInvalido('motivo') ? 'is-danger' : ''}
                                     >
-                                        <option value="">Selecione um motivo</option>
+                                        <option value="">Selecione</option>
                                         <option value="AVARIA">Avaria</option>
                                         <option value="MANUTENCAO">Manutenção</option>
                                     </select>
                                 </div>
+                                {isCampoInvalido('motivo') && (
+                                    <p className="help is-danger">Motivo é obrigatório para solicitação</p>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    <div className="column">
+                    {/* Campo de componente combinado e alinhado */}
+                    <div className="column is-narrow">
                         <div className="field">
-                            <label className="label">Componente</label>
+                            <label className="label is-small" style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+                                <label className="radio is-small" style={{ marginRight: '10px', fontWeight: 'normal' }}>
+                                    <input
+                                        type="radio"
+                                        name="tipoComponente"
+                                        value="motor"
+                                        checked={filtros.tipoComponente === 'motor'}
+                                        onChange={() => handleFiltroChange('tipoComponente', 'motor')}
+                                    />
+                                    <span style={{ fontSize: '0.8rem' }}> Motor</span>
+                                </label>
+                                <label className="radio is-small" style={{ fontWeight: 'normal' }}>
+                                    <input
+                                        type="radio"
+                                        name="tipoComponente"
+                                        value="cambio"
+                                        checked={filtros.tipoComponente === 'cambio'}
+                                        onChange={() => handleFiltroChange('tipoComponente', 'cambio')}
+                                    />
+                                    <span style={{ fontSize: '0.8rem' }}> Câmbio</span>
+                                </label>
+                            </label>
                             <div className="control">
-                                <div className="select is-fullwidth">
-                                    <select 
-                                        value={tipoComponente} 
-                                        onChange={e => setTipoComponente(e.target.value as "motor" | "cambio")}
+                                <div className="select is-small">
+                                    <select
+                                        value={filtros.componente}
+                                        onChange={e => handleFiltroChange('componente', e.target.value)}
                                     >
-                                        <option value="motor">Motor</option>
-                                        <option value="cambio">Câmbio</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="column">
-                        <div className="field">
-                            <label className="label">Número do {tipoComponente === "motor" ? "Motor" : "Câmbio"}</label>
-                            <div className="control">
-                                <div className="select is-fullwidth">
-                                    <select 
-                                        value={componenteSelecionado} 
-                                        onChange={e => setComponenteSelecionado(e.target.value)}
-                                    >
-                                        <option value="">Selecione um {tipoComponente === "motor" ? "motor" : "câmbio"}</option>
-                                        {tipoComponente === "motor" 
+                                        <option value="">Selecione o {filtros.tipoComponente}</option>
+                                        {filtros.tipoComponente === "motor"
                                             ? motorOptions.map(motor => (
                                                 <option key={motor.id} value={motor.numeroMotor}>
                                                     {motor.numeroMotor}
                                                 </option>
-                                              ))
+                                            ))
                                             : cambioOptions.map(cambio => (
                                                 <option key={cambio.id} value={cambio.numeroCambio}>
                                                     {cambio.numeroCambio}
                                                 </option>
-                                              ))
+                                            ))
                                         }
                                     </select>
                                 </div>
@@ -222,14 +307,17 @@ export const OrcamentoForm: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="column is-2">
-                        <div className="field" style={{ paddingTop: "1.8rem" }}>
-                            <button 
-                                onClick={handleCarregar}
-                                className="button is-primary is-fullwidth"
-                            >
-                                Carregar
-                            </button>
+                    <div className="column">
+                        <div className="field">
+                            <label className="label is-small">&nbsp;</label>
+                            <div className="control">
+                                <button
+                                    onClick={handleCarregar}
+                                    className="button is-primary is-small"
+                                >
+                                    Carregar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -237,8 +325,26 @@ export const OrcamentoForm: React.FC = () => {
 
             <Mensagem mensagem={mensagem} tipo={tipoMensagem} />
 
-            {/* Tabela de peças para orçamento */}
-            <TabelaOrcamentoPeca onSolicitarClick={handleSolicitarPeca} />
+            <div className="box" style={{ marginBottom: "20px" }}>
+                <h3 className="title is-5">Solicitar Nova Peça</h3>
+                <TabelaOrcamentoPeca
+                    onSolicitarClick={handleSolicitarPeca}
+                    filtros={filtros}
+                    onValidacaoFiltros={() => {
+                        setCamposTocados({
+                            chassis: true,
+                            etapa: true,
+                            sessao: true,    // Adicionado
+                            motivo: true     // Adicionado
+                        });
+                        setValidacaoSolicitacao(true); // Importante: marca que é validação para solicitação
+                    }}
+                />
+            </div>
+
+            <TabelaSolicitacoes filtros={filtros} novaSolicitacao={ultimaSolicitacao} />
         </Layout>
     );
 };
+
+export default OrcamentoForm;
