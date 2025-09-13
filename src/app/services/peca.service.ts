@@ -75,12 +75,26 @@ export const usePecaService = () => {
         }
     };
 
+    const buscarPecasDistinctPorPartNumber = async (partnumber: string): Promise<Peca[]> => {
+        try {
+            // Usa a nova rota '/listar-distinct'
+            const response: AxiosResponse<Peca[]> = await httpClient.get(`/pecas/listar-distinct?partnumber=${partnumber}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.status === 204) { // NO_CONTENT
+                return [];
+            }
+            throw error;
+        }
+    };
+
     return {
         salvar,
         buscarPecasPorPartNumber,
         buscarPecasPorNome,
         buscarPecaPorId,
         alterar,
-        remover
+        remover,
+        buscarPecasDistinctPorPartNumber
     };
 };

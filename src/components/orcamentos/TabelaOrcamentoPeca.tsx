@@ -53,7 +53,8 @@ export const TabelaOrcamentoPeca: React.FC<TabelaOrcamentoPecaProps> = ({
 
   const handlePesquisa = async () => {
     try {
-      const pecas = await pecaService.buscarPecasPorPartNumber(pesquisa);
+      //const pecas = await pecaService.buscarPecasPorPartNumber(pesquisa);
+      const pecas = await pecaService.buscarPecasDistinctPorPartNumber(pesquisa);
       setResultados(pecas);
       setPesquisaRealizada(true);
     } catch (error) {
@@ -100,7 +101,7 @@ export const TabelaOrcamentoPeca: React.FC<TabelaOrcamentoPecaProps> = ({
         chassis: filtros.chassis,
         eixoLado: ladoSelecionado !== "-" ? ladoSelecionado : undefined,
         numeroMotorCambio: filtros.componente || undefined,
-        estadoPeca: pecaSelecionada.estado,
+        //estadoPeca: pecaSelecionada.estado,
         statusPeca: "PENDENTE"
       };
 
