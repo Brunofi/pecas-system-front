@@ -1,3 +1,5 @@
+//tabela de busca de peças para solicitação de orçamento
+
 "use client";
 import React, { useState } from "react";
 import 'bulma/css/bulma.css';

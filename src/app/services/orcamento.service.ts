@@ -118,6 +118,41 @@ export const useOrcamentoService = () => {
     }
 };
 
+const listarPorFiltrosFlexiveis = async (filtros: {
+    chassis?: string;
+    etapa?: string;
+    sessao?: string;
+    status?: string;
+}): Promise<Orcamento[]> => {
+    try {
+        // Remove campos vazios ou undefined
+        const params: any = {};
+        if (filtros.chassis) params.chassis = filtros.chassis;
+        if (filtros.etapa) params.etapa = filtros.etapa;
+        if (filtros.sessao) params.sessao = filtros.sessao;
+        if (filtros.status) params.status = filtros.status;
+
+        // Se nenhum filtro foi preenchido, retorna array vazio
+        if (Object.keys(params).length === 0) {
+            return [];
+        }
+
+        const response: AxiosResponse<Orcamento[]> = await httpClient.get(
+            `${resourceUrl}/filtrar-flexivel`,
+            { params }
+        );
+        return response.data;
+    } catch (error: any) {
+        if (error.response?.status === 204) { // NO_CONTENT
+            return [];
+        }
+        if (error.response?.data?.mensagem) {
+            throw new Error(error.response.data.mensagem);
+        }
+        throw error;
+    }
+};
+
 
 
     return {
@@ -127,7 +162,8 @@ export const useOrcamentoService = () => {
         atualizar,
         remover,
         listarPorFiltros,
-        cancelarSolicitacao
+        cancelarSolicitacao,
+        listarPorFiltrosFlexiveis
 
     };
 };

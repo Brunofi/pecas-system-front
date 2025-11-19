@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import 'bulma/css/bulma.css';
 import { Orcamento } from "app/models/orcamento";
 import { useOrcamentoService } from "app/services";
@@ -25,6 +25,27 @@ export const TabelaSolicitacoes: React.FC<TabelaSolicitacoesProps> = ({ filtros,
     const [tipoMensagem, setTipoMensagem] = useState<'is-success' | 'is-danger' | ''>('');
 
     const orcamentoService = useOrcamentoService();
+
+    // Função para identificar partNumbers repetidos
+    const partNumbersRepetidos = useMemo(() => {
+        const partNumberCounts: { [key: string]: number } = {};
+        
+        // Conta a ocorrência de cada partNumber
+        solicitacoes.forEach(solicitacao => {
+            if (solicitacao.partnumber) {
+                partNumberCounts[solicitacao.partnumber] = (partNumberCounts[solicitacao.partnumber] || 0) + 1;
+            }
+        });
+
+        // Retorna apenas os partNumbers que aparecem mais de uma vez
+        return Object.keys(partNumberCounts).filter(partNumber => partNumberCounts[partNumber] > 1);
+    }, [solicitacoes]);
+
+    // Função para verificar se uma solicitação tem partNumber repetido
+    const temPartNumberRepetido = (solicitacao: Orcamento): boolean => {
+        if (!solicitacao.partnumber) return false;
+        return partNumbersRepetidos.includes(solicitacao.partnumber);
+    };
 
     // Função para carregar as solicitações
     const carregarSolicitacoes = async () => {
@@ -124,6 +145,14 @@ export const TabelaSolicitacoes: React.FC<TabelaSolicitacoesProps> = ({ filtros,
         <div className="box" style={{ marginTop: "20px" }}>
             <h2 className="title is-6">Peças já solicitadas</h2>
 
+            {/* Mensagem informativa sobre partNumbers repetidos */}
+            {partNumbersRepetidos.length > 0 && (
+                <div className="notification is-warning is-light" style={{ marginBottom: '15px' }}>
+                    <strong>Atenção:</strong> Existem partNumbers repetidos na lista (destacados em amarelo).
+                    PartNumbers repetidos: <strong>{partNumbersRepetidos.join(', ')}</strong>
+                </div>
+            )}
+
             {/* Mensagem de feedback */}
             {mensagem && (
                 <div className={`notification ${tipoMensagem}`} style={{ marginBottom: '15px' }}>
@@ -159,31 +188,53 @@ export const TabelaSolicitacoes: React.FC<TabelaSolicitacoesProps> = ({ filtros,
                                 </tr>
                             </thead>
                             <tbody>
-                                {solicitacoes.map((solicitacao) => (
-                                    <tr
-                                        key={solicitacao.id}
-                                        onClick={() => setSolicitacaoSelecionada(solicitacao)}
-                                        style={{
-                                            backgroundColor: solicitacaoSelecionada?.id === solicitacao.id ? '#e6f7ff' : 'inherit',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        <td>{solicitacao.id}</td>
-                                        <td>{solicitacao.partnumber || '-'}</td>
-                                        <td>{solicitacao.nomePeca || '-'}</td>
-                                        <td>{solicitacao.quantidade}</td>
-                                        <td>{solicitacao.dataPedido ? formatarData(solicitacao.dataPedido) : '-'}</td>
-                                        <td>{solicitacao.colaboradorPedido || '-'}</td>
-                                        <td>{solicitacao.eixoLado || '-'}</td>
-                                        <td>
-                                            <span className={`tag ${solicitacao.statusPeca === 'PENDENTE' ? 'is-warning' :
-                                                solicitacao.statusPeca === 'SEPARADA' ? 'is-info' :
-                                                    solicitacao.statusPeca === 'CANCELADA' ? 'is-danger' : 'is-success'}`}>
-                                                {solicitacao.statusPeca || 'PENDENTE'}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {solicitacoes.map((solicitacao) => {
+                                    const isRepetido = temPartNumberRepetido(solicitacao);
+                                    const isSelecionado = solicitacaoSelecionada?.id === solicitacao.id;
+                                    
+                                    return (
+                                        <tr
+                                            key={solicitacao.id}
+                                            onClick={() => setSolicitacaoSelecionada(solicitacao)}
+                                            style={{
+                                                backgroundColor: isSelecionado 
+                                                    ? '#e6f7ff' // Azul claro para selecionado
+                                                    : isRepetido 
+                                                        ? '#fffbf0' // Amarelo bem suave para repetidos
+                                                        : 'inherit',
+                                                borderLeft: isRepetido ? '4px solid #ffdd57' : 'none'
+                                            }}
+                                            className={isRepetido ? 'has-background-warning-light' : ''}
+                                        >
+                                            <td>{solicitacao.id}</td>
+                                            <td>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    {solicitacao.partnumber || '-'}
+                                                    {isRepetido && (
+                                                        <span 
+                                                            className="tag is-warning is-small"
+                                                            title="Part Number repetido - Verificar se é intencional"
+                                                        >
+                                                            ⚠
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td>{solicitacao.nomePeca || '-'}</td>
+                                            <td>{solicitacao.quantidade}</td>
+                                            <td>{solicitacao.dataPedido ? formatarData(solicitacao.dataPedido) : '-'}</td>
+                                            <td>{solicitacao.colaboradorPedido || '-'}</td>
+                                            <td>{solicitacao.eixoLado || '-'}</td>
+                                            <td>
+                                                <span className={`tag ${solicitacao.statusPeca === 'PENDENTE' ? 'is-warning' :
+                                                    solicitacao.statusPeca === 'SEPARADA' ? 'is-info' :
+                                                        solicitacao.statusPeca === 'CANCELADA' ? 'is-danger' : 'is-success'}`}>
+                                                    {solicitacao.statusPeca || 'PENDENTE'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
