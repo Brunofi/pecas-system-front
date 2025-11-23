@@ -55,6 +55,8 @@ export const MenuSuperior: React.FC = () => {
                                 <Link href="/cadastros/peca" className="navbar-item">Peça</Link>
                                 <Link href="/cadastros/locacao" className="navbar-item">Locação</Link>
                                 <Link href="/cadastros/estoque" className="navbar-item">Estoque</Link>
+                                <Link href="/cadastros/motor" className="navbar-item">Motor</Link>
+                                <Link href="/cadastros/cambio" className="navbar-item">Câmbio</Link>
                                 {verificarPermissao(perfil, ['gerente']) && (
                                     <Link href="/cadastros/usuario" className="navbar-item">Usuario</Link>
                                 )}
@@ -62,46 +64,46 @@ export const MenuSuperior: React.FC = () => {
                         </div>
                     )}
 
-                    {verificarPermissao(perfil, ['gerente' ]) && (
-                    <div className="navbar-item has-dropdown is-hoverable">
-                        <a className="navbar-link">Alterações</a>
-                        <div className="navbar-dropdown">
-                            <Link href="/alteracoes/estoque" className="navbar-item">Quantidade Estoque</Link>
+                    {verificarPermissao(perfil, ['gerente']) && (
+                        <div className="navbar-item has-dropdown is-hoverable">
+                            <a className="navbar-link">Alterações</a>
+                            <div className="navbar-dropdown">
+                                <Link href="/alteracoes/estoque" className="navbar-item">Quantidade Estoque</Link>
+                            </div>
                         </div>
-                    </div>
                     )}
 
-                    {verificarPermissao(perfil, ['gerente','analista','estoquista' ]) && (
-                    <div className="navbar-item has-dropdown is-hoverable">
-                        <a className="navbar-link">Lançamentos</a>
-                        <div className="navbar-dropdown">
-                            <Link href="/lancamentos/saidapeca" className="navbar-item">Saída de peça</Link>
-                            <Link href="/lancamentos/entradapeca" className="navbar-item">Entrada de peça</Link>
-                            <Link href="/lancamentos/recuperacaopeca" className="navbar-item">Recuperação de peça</Link>
-                            <Link href="/lancamentos/desfazerlancamentopeca" className="navbar-item">Desfazer lançamento</Link>
-                            <Link href="/lancamentos/movimentarqtd" className="navbar-item">Movimentações qtd entre locações</Link>
-                            <Link href="/lancamentos/trocarlocacao" className="navbar-item">Trocar peça de locação</Link>
+                    {verificarPermissao(perfil, ['gerente', 'analista', 'estoquista']) && (
+                        <div className="navbar-item has-dropdown is-hoverable">
+                            <a className="navbar-link">Lançamentos</a>
+                            <div className="navbar-dropdown">
+                                <Link href="/lancamentos/saidapeca" className="navbar-item">Saída de peça</Link>
+                                <Link href="/lancamentos/entradapeca" className="navbar-item">Entrada de peça</Link>
+                                <Link href="/lancamentos/recuperacaopeca" className="navbar-item">Recuperação de peça</Link>
+                                <Link href="/lancamentos/desfazerlancamentopeca" className="navbar-item">Desfazer lançamento</Link>
+                                <Link href="/lancamentos/movimentarqtd" className="navbar-item">Movimentações qtd entre locações</Link>
+                                <Link href="/lancamentos/trocarlocacao" className="navbar-item">Trocar peça de locação</Link>
+                            </div>
                         </div>
-                    </div>
                     )}
 
-                    {verificarPermissao(perfil, ['gerente','analista','estoquista','mecanico', 'engenheiro' ]) && (
-                    <div className="navbar-item has-dropdown is-hoverable">
-                        <a className="navbar-link">Orçamentos</a>
-                        <div className="navbar-dropdown">
-                            <Link href="/orcamentos/orcamentopeca" className="navbar-item">Solicitar peças</Link>
-                            {verificarPermissao(perfil, ['gerente','analista','estoquista', ]) && (
-                            <Link href="/orcamentos/visualizarorcamentos" className="navbar-item">Visualizar orçamentos</Link>
-                            )}
-                            {verificarPermissao(perfil, ['gerente','analista','estoquista', ]) && (
-                            <Link href="/orcamentos/lancarpecasentregues" className="navbar-item">Lançar peças entregues</Link>
-                            )}
+                    {verificarPermissao(perfil, ['gerente', 'analista', 'estoquista', 'mecanico', 'engenheiro']) && (
+                        <div className="navbar-item has-dropdown is-hoverable">
+                            <a className="navbar-link">Orçamentos</a>
+                            <div className="navbar-dropdown">
+                                <Link href="/orcamentos/orcamentopeca" className="navbar-item">Solicitar peças</Link>
+                                {verificarPermissao(perfil, ['gerente', 'analista', 'estoquista',]) && (
+                                    <Link href="/orcamentos/visualizarorcamentos" className="navbar-item">Visualizar orçamentos</Link>
+                                )}
+                                {verificarPermissao(perfil, ['gerente', 'analista', 'estoquista',]) && (
+                                    <Link href="/orcamentos/lancarpecasentregues" className="navbar-item">Lançar peças entregues</Link>
+                                )}
+                            </div>
                         </div>
-                    </div>
                     )}
 
-                     {/* Menu Relatórios (apenas engenheiro) */}
-                     {verificarPermissao(perfil, ['engenheiro', 'gerente']) && (
+                    {/* Menu Relatórios (apenas engenheiro) */}
+                    {verificarPermissao(perfil, ['engenheiro', 'gerente']) && (
                         <div className="navbar-item has-dropdown is-hoverable">
                             <a className="navbar-link">Relatórios</a>
                             <div className="navbar-dropdown">
@@ -121,7 +123,7 @@ export const MenuSuperior: React.FC = () => {
 
                 {/* Botão de Logout no canto direito */}
                 <div className="navbar-end">
-                {nomeUsuario && (
+                    {nomeUsuario && (
                         <div className="navbar-item">
                             <span className="has-text-weight-semibold">Bem-vindo, {nomeUsuario}!</span>
                         </div>
