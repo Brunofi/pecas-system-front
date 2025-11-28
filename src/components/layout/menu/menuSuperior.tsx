@@ -57,6 +57,9 @@ export const MenuSuperior: React.FC = () => {
                                 <Link href="/cadastros/estoque" className="navbar-item">Estoque</Link>
                                 <Link href="/cadastros/motor" className="navbar-item">Motor</Link>
                                 <Link href="/cadastros/cambio" className="navbar-item">Câmbio</Link>
+                                <Link href="/cadastros/chassis" className="navbar-item">Chassis</Link>
+                                <Link href="/cadastros/sessao" className="navbar-item">Sessão</Link>
+                                <Link href="/cadastros/etapa" className="navbar-item">Etapa</Link>
                                 {verificarPermissao(perfil, ['gerente']) && (
                                     <Link href="/cadastros/usuario" className="navbar-item">Usuario</Link>
                                 )}

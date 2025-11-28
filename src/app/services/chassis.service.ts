@@ -34,8 +34,53 @@ export const useChassisService = () => {
         }
     };
 
+    // Cadastra um novo chassis
+    const cadastrarChassis = async (chassis: Chassis): Promise<string> => {
+        const url = `${resourceUrl}/cadastrar`;
+        try {
+            const response: AxiosResponse<{ mensagem: string }> = await httpClient.post(url, chassis);
+            return response.data.mensagem;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.mensagem || "Erro ao cadastrar chassis");
+            }
+            throw error;
+        }
+    };
+
+    // Atualiza um chassis existente
+    const atualizarChassis = async (chassis: Chassis): Promise<string> => {
+        const url = `${resourceUrl}/alterar`;
+        try {
+            const response: AxiosResponse<{ mensagem: string }> = await httpClient.put(url, chassis);
+            return response.data.mensagem;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.mensagem || "Erro ao atualizar chassis");
+            }
+            throw error;
+        }
+    };
+
+    // Remove um chassis por ID
+    const removerChassis = async (id: number): Promise<string> => {
+        const url = `${resourceUrl}/remover/${id}`;
+        try {
+            const response: AxiosResponse<{ mensagem: string }> = await httpClient.delete(url);
+            return response.data.mensagem;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.mensagem || "Erro ao remover chassis");
+            }
+            throw error;
+        }
+    };
+
     return {
         listarChassis,
-        buscarChassisPorId
+        buscarChassisPorId,
+        cadastrarChassis,
+        atualizarChassis,
+        removerChassis
     };
 };
