@@ -28,8 +28,10 @@ export const TabelaSolicitacoes: React.FC<TabelaSolicitacoesProps> = ({ filtros,
 
     // Função para identificar partNumbers repetidos
     const partNumbersRepetidos = useMemo(() => {
+        if (!Array.isArray(solicitacoes)) return [];
+
         const partNumberCounts: { [key: string]: number } = {};
-        
+
         // Conta a ocorrência de cada partNumber
         solicitacoes.forEach(solicitacao => {
             if (solicitacao.partnumber) {
@@ -64,7 +66,12 @@ export const TabelaSolicitacoes: React.FC<TabelaSolicitacoesProps> = ({ filtros,
                 sessao: filtros.sessao || undefined,
                 motivo: filtros.motivo || undefined
             });
-            setSolicitacoes(dados);
+
+            if (Array.isArray(dados)) {
+                setSolicitacoes(dados);
+            } else {
+                setSolicitacoes([]);
+            }
             setFiltrosProntos(true);
         } catch (error) {
             console.error("Erro ao carregar solicitações:", error);
@@ -77,7 +84,7 @@ export const TabelaSolicitacoes: React.FC<TabelaSolicitacoesProps> = ({ filtros,
     // Função para formatar a data
     const formatarData = (dataString?: string) => {
         if (!dataString) return '-';
-        
+
         try {
             const data = new Date(dataString);
             // Verifica se é uma data válida
@@ -191,15 +198,15 @@ export const TabelaSolicitacoes: React.FC<TabelaSolicitacoesProps> = ({ filtros,
                                 {solicitacoes.map((solicitacao) => {
                                     const isRepetido = temPartNumberRepetido(solicitacao);
                                     const isSelecionado = solicitacaoSelecionada?.id === solicitacao.id;
-                                    
+
                                     return (
                                         <tr
                                             key={solicitacao.id}
                                             onClick={() => setSolicitacaoSelecionada(solicitacao)}
                                             style={{
-                                                backgroundColor: isSelecionado 
+                                                backgroundColor: isSelecionado
                                                     ? '#e6f7ff' // Azul claro para selecionado
-                                                    : isRepetido 
+                                                    : isRepetido
                                                         ? '#fffbf0' // Amarelo bem suave para repetidos
                                                         : 'inherit',
                                                 borderLeft: isRepetido ? '4px solid #ffdd57' : 'none'
@@ -211,7 +218,7 @@ export const TabelaSolicitacoes: React.FC<TabelaSolicitacoesProps> = ({ filtros,
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                     {solicitacao.partnumber || '-'}
                                                     {isRepetido && (
-                                                        <span 
+                                                        <span
                                                             className="tag is-warning is-small"
                                                             title="Part Number repetido - Verificar se é intencional"
                                                         >

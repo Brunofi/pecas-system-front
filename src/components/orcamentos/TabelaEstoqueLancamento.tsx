@@ -2,16 +2,17 @@
 import React, { useEffect, useState } from "react";
 import 'bulma/css/bulma.css';
 import { Estoque } from "app/models/estoque";
-import { useEstoqueService } from "app/services";
+import { useEstoqueService, useSaidaService } from "app/services";
 import { useOrcamentoService } from "app/services";
 import { Orcamento } from "app/models/orcamento";
+import { Saida } from "app/models/saida";
 
 type TabelaEstoqueLancamentoProps = {
     orcamentoSelecionado: Orcamento | null;
     onRegistroSucesso?: () => void;
 };
 
-export const TabelaEstoqueLancamento: React.FC<TabelaEstoqueLancamentoProps> = ({ 
+export const TabelaEstoqueLancamento: React.FC<TabelaEstoqueLancamentoProps> = ({
     orcamentoSelecionado,
     onRegistroSucesso
 }) => {
@@ -23,6 +24,7 @@ export const TabelaEstoqueLancamento: React.FC<TabelaEstoqueLancamentoProps> = (
 
     const estoqueService = useEstoqueService();
     const orcamentoService = useOrcamentoService();
+    const saidaService = useSaidaService();
 
     const mostrarMensagem = (mensagem: string, tipo: 'is-success' | 'is-danger') => {
         setMensagem(mensagem);
@@ -82,23 +84,45 @@ export const TabelaEstoqueLancamento: React.FC<TabelaEstoqueLancamentoProps> = (
             return;
         }
 
-        // Calcular nova quantidade (subtrair a quantidade pedida)
-        const quantidadeAtual = estoqueSelecionado.quantidade;
-        const quantidadePedida = orcamentoSelecionado.quantidade;
-        const novaQuantidade = quantidadeAtual - quantidadePedida;
+        if (!estoqueSelecionado.peca || !estoqueSelecionado.peca.id) {
+            mostrarMensagem("Peça do estoque inválida", 'is-danger');
+            return;
+        }
 
-        if (novaQuantidade < 0) {
-            mostrarMensagem("Quantidade em estoque insuficiente", 'is-danger');
+        if (!estoqueSelecionado.locacao || !estoqueSelecionado.locacao.id) {
+            mostrarMensagem("Locação do estoque inválida", 'is-danger');
             return;
         }
 
         try {
-            // 1. Dar baixa no estoque
-            await estoqueService.alterarQuantidade(
-                estoqueSelecionado.id,
-                novaQuantidade
-            );
-            
+            // Objeto Saida mapeado conforme regras de negócio
+            const novaSaida: Saida = {
+                quantidade: orcamentoSelecionado.quantidade,
+                tipoConsumo: "CONSUMO",
+                colaboradorEntrega: orcamentoSelecionado.colaboradorEntrega || "",
+                colaboradorRetirada: orcamentoSelecionado.colaboradorPedido,
+                colaboradorLancamento: localStorage.getItem('usuario_logado') || localStorage.getItem('nome') || "",
+                motivoConsumo: orcamentoSelecionado.motivoConsumo as any,
+                etapa: orcamentoSelecionado.etapa,
+                sessao: orcamentoSelecionado.sessao,
+                chassis: orcamentoSelecionado.chassis,
+                chassisCedente: "-",
+                eixoLado: orcamentoSelecionado.eixoLado,
+                peca: {
+                    id: estoqueSelecionado.peca.id,
+                    partnumber: estoqueSelecionado.peca.partnumber, // Preencher campos obrigatórios da interface Peca
+                    nome: estoqueSelecionado.peca.nome
+                } as any, // Cast para any ou preencher tudo se necessário, mas o backend só precisa do ID
+                locacao: {
+                    id: estoqueSelecionado.locacao.id,
+                    locacao: estoqueSelecionado.locacao.locacao
+                } as any,
+                estoque: { id: estoqueSelecionado.id }
+            };
+
+            // 1. Cadastrar saída (o backend já subtrai do estoque)
+            await saidaService.cadastrar(novaSaida);
+
             // 2. Atualizar status do orçamento para "LANCADA"
             const orcamentoAtualizado: Orcamento = {
                 ...orcamentoSelecionado,
@@ -106,9 +130,9 @@ export const TabelaEstoqueLancamento: React.FC<TabelaEstoqueLancamentoProps> = (
             };
 
             await orcamentoService.atualizar(orcamentoAtualizado);
-            
-            mostrarMensagem("Registro realizado com sucesso! Status alterado para LANCADA.", 'is-success');
-            
+
+            mostrarMensagem("Registro realizado com sucesso! Saída criada e estoque atualizado.", 'is-success');
+
             // 3. Atualizar a lista de estoques
             if (orcamentoSelecionado.partnumber) {
                 const dados = await estoqueService.buscarEstoquesPorPartNumber(
@@ -116,15 +140,15 @@ export const TabelaEstoqueLancamento: React.FC<TabelaEstoqueLancamentoProps> = (
                 );
                 setEstoques(dados);
             }
-            
+
             // 4. Limpar seleções
             setEstoqueSelecionado(null);
-            
+
             // 5. Notificar o componente pai para recarregar a lista de orçamentos
             if (onRegistroSucesso) {
                 onRegistroSucesso();
             }
-            
+
         } catch (error: any) {
             console.error("Erro ao registrar:", error);
             mostrarMensagem("Erro ao registrar: " + error.message, 'is-danger');
@@ -174,7 +198,7 @@ export const TabelaEstoqueLancamento: React.FC<TabelaEstoqueLancamentoProps> = (
                             </thead>
                             <tbody>
                                 {estoques.map((estoque) => (
-                                    <tr 
+                                    <tr
                                         key={estoque.id}
                                         onClick={() => handleRowClick(estoque)}
                                         style={{

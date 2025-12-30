@@ -79,11 +79,41 @@ export const useSaidaService = () => {
         }
     };
 
+    // Busca lançamentos por Chassis e Etapa
+    const buscarLancamentos = async (chassis: string, etapa: string): Promise<Saida[]> => {
+        const url = `${resourceUrl}/buscar-lancamentos?chassis=${chassis}&etapa=${etapa}`;
+        try {
+            const response: AxiosResponse<{ data: Saida[] }> = await httpClient.get(url);
+            return response.data.data; // Retorna a lista de saídas
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.mensagem);
+            }
+            throw error;
+        }
+    };
+
+    // Desfaz um lançamento de saída
+    const desfazerLancamento = async (id: number): Promise<string> => {
+        const url = `${resourceUrl}/desfazer/${id}`;
+        try {
+            const response: AxiosResponse<{ mensagem: string }> = await httpClient.delete(url);
+            return response.data.mensagem; // Retorna a mensagem de sucesso
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.mensagem);
+            }
+            throw error;
+        }
+    };
+
     return {
         cadastrar,
         listar,
         buscarPorId,
         atualizar,
-        remover
+        remover,
+        buscarLancamentos,
+        desfazerLancamento
     };
 };

@@ -38,8 +38,10 @@ export const TabelaVisualizarOrcamento: React.FC<TabelaVisualizarOrcamentoProps>
 
     // Função para identificar partNumbers repetidos
     const partNumbersRepetidos = useMemo(() => {
+        if (!Array.isArray(orcamentos)) return [];
+
         const partNumberCounts: { [key: string]: number } = {};
-        
+
         // Conta a ocorrência de cada partNumber
         orcamentos.forEach(orcamento => {
             if (orcamento.partnumber) {
@@ -96,10 +98,12 @@ export const TabelaVisualizarOrcamento: React.FC<TabelaVisualizarOrcamentoProps>
                 status: filtros.status || undefined
             });
 
+            const listaDados = Array.isArray(dados) ? dados : [];
+
             // Filtragem adicional por status (se necessário)
-            let dadosFiltrados = dados;
+            let dadosFiltrados = listaDados;
             if (filtros.status) {
-                dadosFiltrados = dados.filter(orc => orc.statusPeca === filtros.status);
+                dadosFiltrados = listaDados.filter(orc => orc.statusPeca === filtros.status);
             }
 
             setOrcamentos(dadosFiltrados);
@@ -235,10 +239,13 @@ export const TabelaVisualizarOrcamento: React.FC<TabelaVisualizarOrcamentoProps>
                 statusFinal = `VALE-PEÇA (${chassisSelecionado})`;
             }
 
+            const nomeUsuario = localStorage.getItem('usuario_logado') || localStorage.getItem('nome') || 'Usuário Desconhecido';
+
             const orcamentoAtualizado: Orcamento = {
                 ...orcamentoSelecionado,
                 statusPeca: statusFinal as any,
                 estadoPeca: novoStatus === 'ENTREGUE' ? estadoPeca : orcamentoSelecionado.estadoPeca,
+                colaboradorEntrega: nomeUsuario
             };
 
             const mensagemSucesso = await orcamentoService.atualizar(orcamentoAtualizado);
@@ -323,15 +330,15 @@ export const TabelaVisualizarOrcamento: React.FC<TabelaVisualizarOrcamentoProps>
                                 {orcamentos.map((orcamento) => {
                                     const isRepetido = temPartNumberRepetido(orcamento);
                                     const isSelecionado = orcamentoSelecionado?.id === orcamento.id;
-                                    
+
                                     return (
                                         <tr
                                             key={orcamento.id}
                                             onClick={() => setOrcamentoSelecionado(orcamento)}
                                             style={{
-                                                backgroundColor: isSelecionado 
+                                                backgroundColor: isSelecionado
                                                     ? '#e6f7ff' // Azul claro para selecionado
-                                                    : isRepetido 
+                                                    : isRepetido
                                                         ? '#fffbf0' // Amarelo bem suave para repetidos
                                                         : 'inherit',
                                                 borderLeft: isRepetido ? '4px solid #ffdd57' : 'none',
@@ -344,7 +351,7 @@ export const TabelaVisualizarOrcamento: React.FC<TabelaVisualizarOrcamentoProps>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                     {orcamento.partnumber || '-'}
                                                     {isRepetido && (
-                                                        <span 
+                                                        <span
                                                             className="tag is-warning is-small"
                                                             title="Part Number repetido - Verificar se é intencional"
                                                         >

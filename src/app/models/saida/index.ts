@@ -16,7 +16,7 @@ export interface Saida {
     chassis: string;
     chassisCedente?: string;
     eixoLado?: string;
-    peca: { id: number }; // Ajuste para enviar apenas o ID da peça
-    locacao: { id: number }; // Ajuste para enviar apenas o ID da locação
+    peca: Peca;
+    locacao: Locacao;
     estoque?: { id: number }; // Ajuste para enviar apenas o ID do estoque
 }
