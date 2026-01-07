@@ -21,6 +21,14 @@ export const FormVisualizarOrcamentos: React.FC = () => {
         status: ""
     });
 
+    // Estado para os filtros confirmados (Busca)
+    const [filtrosBusca, setFiltrosBusca] = useState({
+        chassis: "",
+        etapa: "",
+        sessao: "",
+        status: ""
+    });
+
     // Estados para as listas de opções
     const [chassisOptions, setChassisOptions] = useState<Chassis[]>([]);
     const [etapaOptions, setEtapaOptions] = useState<Etapa[]>([]);
@@ -70,8 +78,16 @@ export const FormVisualizarOrcamentos: React.FC = () => {
     };
 
     const handleCarregar = () => {
-        // Aqui você implementará a lógica de carregar os dados
-        mostrarMensagem("Filtros aplicados! (Lógica de carregamento será implementada)", 'is-success');
+        // Validação: Verificar se pelo menos um filtro foi selecionado
+        const temFiltroSelecionado = Object.values(filtros).some(valor => valor.trim() !== '');
+
+        if (!temFiltroSelecionado) {
+            mostrarMensagem("Selecione pelo menos um filtro para buscar", 'is-danger');
+            return;
+        }
+
+        // Atualiza os filtros de busca para disparar a pesquisa na tabela
+        setFiltrosBusca(filtros);
     };
 
     // Opções de status para o filtro
@@ -200,7 +216,7 @@ export const FormVisualizarOrcamentos: React.FC = () => {
             <Mensagem mensagem={mensagem} tipo={tipoMensagem} />
 
 
-            <TabelaVisualizarOrcamento filtros={filtros} />
+            <TabelaVisualizarOrcamento filtros={filtrosBusca} />
         </Layout>
     );
 };

@@ -85,7 +85,7 @@ export const TabelaVisualizarOrcamento: React.FC<TabelaVisualizarOrcamentoProps>
 
             if (!filtrosPreenchidos) {
                 setOrcamentos([]);
-                setDadosCarregados(true);
+                setDadosCarregados(false);
                 setLoading(false);
                 return;
             }
@@ -108,6 +108,10 @@ export const TabelaVisualizarOrcamento: React.FC<TabelaVisualizarOrcamentoProps>
 
             setOrcamentos(dadosFiltrados);
             setDadosCarregados(true);
+
+            if (dadosFiltrados.length === 0) {
+                mostrarMensagem("Nenhum orçamento encontrado com os filtros selecionados.", 'is-danger');
+            }
 
             // Buscar informações de estoque (mantido igual)
             if (dadosFiltrados.length > 0) {
@@ -145,12 +149,7 @@ export const TabelaVisualizarOrcamento: React.FC<TabelaVisualizarOrcamentoProps>
 
     // Carregar quando filtros mudam
     useEffect(() => {
-        // Debounce para evitar muitas requisições
-        const timeoutId = setTimeout(() => {
-            carregarOrcamentos();
-        }, 300); // Aguarda 300ms após a última alteração
-
-        return () => clearTimeout(timeoutId);
+        carregarOrcamentos();
     }, [filtros.chassis, filtros.etapa, filtros.sessao, filtros.status]);
 
     const mostrarMensagem = (mensagem: string, tipo: 'is-success' | 'is-danger') => {

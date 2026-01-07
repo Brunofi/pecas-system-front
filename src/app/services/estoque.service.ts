@@ -15,7 +15,7 @@ export const useEstoqueService = () => {
                     idLocacao
                 }
             });
-            
+
             return response.data.mensagem; // Retorna a mensagem de sucesso
         } catch (error: any) {
             if (error.response) {
@@ -68,8 +68,8 @@ export const useEstoqueService = () => {
         }
     };
 
-    
-     const alterarQuantidade = async (id: number, quantidade: number): Promise<string> => {
+
+    const alterarQuantidade = async (id: number, quantidade: number): Promise<string> => {
         const url = `${resourceUrl}/alterar-quantidade/${id}`;
         try {
             const response: AxiosResponse<{ mensagem: string }> = await httpClient.put(url, null, {
@@ -77,7 +77,7 @@ export const useEstoqueService = () => {
                     quantidade
                 }
             });
-            
+
             return response.data.mensagem; // Retorna a mensagem de sucesso
         } catch (error: any) {
             if (error.response) {
@@ -87,8 +87,39 @@ export const useEstoqueService = () => {
             throw error;
         }
     };
-    
-    
+
+
+
+
+    const movimentarEntreLocacoes = async (idOrigem: number, idDestino: number, quantidade: number): Promise<string> => {
+        const url = `${resourceUrl}/movimentar`;
+
+        // Garante que os dados sejam números válidos antes de enviar
+        if (!idOrigem || !idDestino || !quantidade) {
+            throw new Error("Dados inválidos para movimentação (IDs ou Quantidade faltando).");
+        }
+
+        try {
+            // Envia os dados como params (Query String) para alinhar com @RequestParam do Java
+            const response: AxiosResponse<{ mensagem: string }> = await httpClient.put(url, null, {
+                params: {
+                    idOrigem: Number(idOrigem),
+                    idDestino: Number(idDestino),
+                    quantidade: Number(quantidade)
+                }
+            });
+
+            return response.data.mensagem;
+        } catch (error: any) {
+            console.error("Erro na requisição de movimentação:", error);
+
+            if (error.response && error.response.data && error.response.data.mensagem) {
+                throw new Error(error.response.data.mensagem);
+            }
+            throw new Error("Erro ao realizar a movimentação. Verifique se os dados estão corretos.");
+        }
+    };
+
 
 
     return {
@@ -96,7 +127,8 @@ export const useEstoqueService = () => {
         buscarEstoquesPorPartNumber,
         buscarEstoquePorId,
         alterarQuantidade,
-        buscarEstoquesPorNome
+        buscarEstoquesPorNome,
+        movimentarEntreLocacoes
     };
 
 
