@@ -82,7 +82,6 @@ export const MenuSuperior: React.FC = () => {
                             <div className="navbar-dropdown">
                                 <Link href="/lancamentos/saidapeca" className="navbar-item">Saída de peça</Link>
                                 <Link href="/lancamentos/entradapeca" className="navbar-item">Entrada de peça</Link>
-                                <Link href="/lancamentos/recuperacaopeca" className="navbar-item">Recuperação de peça</Link>
                                 <Link href="/lancamentos/desfazerlancamentopeca" className="navbar-item">Desfazer lançamento</Link>
                                 <Link href="/lancamentos/movimentarqtd" className="navbar-item">Movimentações qtd entre locações</Link>
                                 <Link href="/lancamentos/trocarlocacao" className="navbar-item">Trocar peça de locação</Link>
@@ -116,12 +115,17 @@ export const MenuSuperior: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="navbar-item has-dropdown is-hoverable">
-                        <a className="navbar-link">Inventario</a>
-                        <div className="navbar-dropdown">
-                            <Link href="/Inventario/parcia" className="navbar-item">Inventario Parcia</Link>
+                    {/* Menu Inventario */}
+                    {verificarPermissao(perfil, ['gerente', 'analista', 'estoquista']) && (
+                        <div className="navbar-item has-dropdown is-hoverable">
+                            <a className="navbar-link">Inventario</a>
+                            <div className="navbar-dropdown">
+                                <Link href="/Inventario/parcia" className="navbar-item">Inventario Parcial</Link>
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+
                 </div>
 
                 {/* Botão de Logout no canto direito */}

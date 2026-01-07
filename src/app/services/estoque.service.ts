@@ -120,6 +120,30 @@ export const useEstoqueService = () => {
         }
     };
 
+    const trocarLocacao = async (idEstoque: number, idNovaLocacao: number): Promise<string> => {
+        const url = `${resourceUrl}/trocar-locacao`;
+
+        if (!idEstoque || !idNovaLocacao) {
+            throw new Error("Dados inválidos (ID Estoque ou Nova Locação faltando).");
+        }
+
+        try {
+            const response: AxiosResponse<{ mensagem: string }> = await httpClient.put(url, null, {
+                params: {
+                    idEstoque: Number(idEstoque),
+                    idNovaLocacao: Number(idNovaLocacao)
+                }
+            });
+            return response.data.mensagem;
+        } catch (error: any) {
+            console.error("Erro na requisição de troca de locação:", error);
+            if (error.response && error.response.data && error.response.data.mensagem) {
+                throw new Error(error.response.data.mensagem);
+            }
+            throw new Error("Erro ao realizar a troca de locação.");
+        }
+    };
+
 
 
     return {
@@ -128,7 +152,8 @@ export const useEstoqueService = () => {
         buscarEstoquePorId,
         alterarQuantidade,
         buscarEstoquesPorNome,
-        movimentarEntreLocacoes
+        movimentarEntreLocacoes,
+        trocarLocacao
     };
 
 
